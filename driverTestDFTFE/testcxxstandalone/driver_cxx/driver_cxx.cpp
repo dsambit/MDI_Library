@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
   MDI_Send_command("<FORCES", comm);
   MDI_Recv(forces, 3*natoms, MDI_DOUBLE, comm); 
   for (int i=0; i<natoms; i++)
-     std::cout<<"Atomid: "<<i<<", x: "<<forces[3*i+0]<<", y: "<<forces[3*i+1]<<", z: "<<forces[3*i+2]<<std::endl;
+     std::cout<<"Force, Atomid: "<<i<<", x: "<<forces[3*i+0]<<", y: "<<forces[3*i+1]<<", z: "<<forces[3*i+2]<<std::endl;
 
   //update coordinates
   coords[0]=0.1;
