@@ -2,6 +2,7 @@
 #include <mpi.h>
 #include <stdexcept>
 #include <string.h>
+#include <iomanip>
 #include "mdi.h"
 
 //
@@ -145,7 +146,7 @@ int main(int argc, char **argv) {
   double energy;
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"DFT free energy: "<<energy<<std::endl;
+  std::cout<<"DFT free energy: "<<std::setprecision(10)<<energy<<std::endl;
 
   //get forces
   double forces[3*natoms];
@@ -164,7 +165,7 @@ int main(int argc, char **argv) {
   //compute energy
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"DFT free energy after COORDS update: "<<energy<<std::endl;
+  std::cout<<"DFT free energy after COORDS update: "<<std::setprecision(10)<<energy<<std::endl;
 
   //update cell
   cell[0]=10.0;cell[1]=0.1;cell[2]=0.0;
@@ -176,7 +177,7 @@ int main(int argc, char **argv) {
   //compute energy
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"DFT free energy after CELL update: "<<energy<<std::endl;
+  std::cout<<"DFT free energy after CELL update: "<<std::setprecision(10)<<energy<<std::endl;
 
 
   delete[] engine_name;
