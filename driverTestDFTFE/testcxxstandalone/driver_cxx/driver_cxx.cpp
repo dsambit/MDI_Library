@@ -4,6 +4,14 @@
 #include <string.h>
 #include "mdi.h"
 
+//
+//This demo example runs a ground-state DFT on a single material system.
+//
+//Periodic BCC AlNi 2x2x2 16 atom super cell using DFT-FE with ONCV pseudopotentials and Gamma point.
+//
+//Functionality to update COORDS and CELL is also tested
+//
+
 int main(int argc, char **argv) {
   int ret;
 
@@ -69,21 +77,20 @@ int main(int argc, char **argv) {
 
 
   //Send natoms
-  int natoms=1;
+  int natoms=16;
   MDI_Send_command(">NATOMS", comm);
   MDI_Send(&natoms, 1, MDI_INT, comm);
 
   //Send elements
-  int elements[natoms];
-  elements[0]=13;
+  int elements[natoms]={13,28,13,28,13,28,13,28,13,28,13,28,13,28,13,28};
   MDI_Send_command(">ELEMENTS", comm);
   MDI_Send(&elements, natoms, MDI_INT, comm);
 
   //Send cell
   double cell[9];
-  cell[0]=10.0;cell[1]=0.0;cell[2]=0.0;
-  cell[3]=0.0;cell[4]=10.0;cell[5]=0.0;
-  cell[6]=0.0;cell[7]=0.0;cell[8]=10.0;  
+  cell[0]=10.9146877116;cell[1]=0.0;cell[2]=0.0;
+  cell[3]=0.0;cell[4]=10.9146877116;cell[5]=0.0;
+  cell[6]=0.0;cell[7]=0.0;cell[8]=10.9146877116;  
   MDI_Send_command(">CELL", comm);
   MDI_Send(cell, 9, MDI_DOUBLE, comm);
 
@@ -95,11 +102,40 @@ int main(int argc, char **argv) {
   MDI_Send_command(">DIMENSIONS", comm);
   MDI_Send(dimensions, 3, MDI_INT, comm);
 
+  //
   //Send cartesian coordinates, origin at cell corner
-  double coords[3*natoms];
-  coords[0]=0.0;
-  coords[1]=0.0;
-  coords[2]=0.0;
+  //
+
+  //initialize with fractional and then convert to cartesian
+  double coordsfrac[3*natoms]={0.000000000000,0.000000000000,0.000000000000,
+                                      0.250000000000,0.250000000000,0.250000000000,
+                                      0.000000000000,0.000000000000,0.500000000000,
+                                      0.250000000000,0.250000000000,0.750000000000,
+				                              0.000000000000,0.500000000000,0.000000000000,
+                                      0.250000000000,0.750000000000,0.250000000000,
+                                      0.000000000000,0.500000000000,0.500000000000,
+                                      0.250000000000,0.750000000000,0.750000000000,
+                                      0.500000000000,0.000000000000,0.000000000000,
+                                      0.750000000000,0.250000000000,0.250000000000,
+                                      0.500000000000,0.000000000000,0.500000000000,
+                                      0.750000000000,0.250000000000,0.750000000000,
+                                      0.500000000000,0.500000000000,0.000000000000,
+                                      0.750000000000,0.750000000000,0.250000000000,
+                                      0.500000000000,0.500000000000,0.500000000000,
+                                      0.750000000000,0.750000000000,0.750000000000};
+
+  double coords[3*natoms]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};                                      
+
+  for (unsigned int i=0;i<natoms;++i)
+    for (unsigned int j=0;j<3;++j)      
+       for (unsigned int l=0;l<3;++l)
+          coords[3*i+j]+=cell[3*l+j]*coordsfrac[3*i+l];
+
+  //for (int i=0; i<natoms; i++)
+  //   std::cout<<"coords: "<<i<<", x: "<<coords[3*i+0]<<", y: "<<coords[3*i+1]<<", z: "<<coords[3*i+2]<<std::endl;
+
   MDI_Send_command(">COORDS", comm);
   MDI_Send(coords, 3*natoms, MDI_DOUBLE, comm);
 
@@ -109,14 +145,14 @@ int main(int argc, char **argv) {
   double energy;
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"energy: "<<energy<<std::endl;
+  std::cout<<"DFT free energy: "<<energy<<std::endl;
 
   //get forces
   double forces[3*natoms];
   MDI_Send_command("<FORCES", comm);
   MDI_Recv(forces, 3*natoms, MDI_DOUBLE, comm); 
-  for (int i=0; i<3*natoms; i++)
-    std::cout<<"force: "<<forces[i]<<std::endl;
+  for (int i=0; i<natoms; i++)
+     std::cout<<"Atomid: "<<i<<", x: "<<forces[3*i+0]<<", y: "<<forces[3*i+1]<<", z: "<<forces[3*i+2]<<std::endl;
 
   //update coordinates
   coords[0]=0.1;
@@ -128,19 +164,19 @@ int main(int argc, char **argv) {
   //compute energy
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"energy after coords update: "<<energy<<std::endl;
+  std::cout<<"DFT free energy after COORDS update: "<<energy<<std::endl;
 
   //update cell
-  cell[0]=12.0;cell[1]=0.1;cell[2]=0.0;
-  cell[3]=0.0;cell[4]=12.0;cell[5]=0.0;
-  cell[6]=0.2;cell[7]=0.5;cell[8]=8.0;  
+  cell[0]=10.0;cell[1]=0.1;cell[2]=0.0;
+  cell[3]=0.0;cell[4]=11.0;cell[5]=0.0;
+  cell[6]=0.2;cell[7]=0.5;cell[8]=10.9146877116;  
   MDI_Send_command(">CELL", comm);
   MDI_Send(cell, 9, MDI_DOUBLE, comm);
 
   //compute energy
   MDI_Send_command("<ENERGY", comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, comm);  
-  std::cout<<"energy after cell update: "<<energy<<std::endl;
+  std::cout<<"DFT free energy after CELL update: "<<energy<<std::endl;
 
 
   delete[] engine_name;
