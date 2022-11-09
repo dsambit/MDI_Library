@@ -76,5 +76,6 @@ add_subdirectory(MDI_Library)
 # compile test codes
 if ( test_codes )
    #add_subdirectory(tests)
-   add_subdirectory(driverTestDFTFE)
+   #add_subdirectory(driverTestDFTFEStandalone)
+   add_subdirectory(driverTestDFTFEPlugin)
 endif()
