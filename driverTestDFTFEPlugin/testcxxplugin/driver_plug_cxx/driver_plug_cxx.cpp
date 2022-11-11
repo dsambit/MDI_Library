@@ -73,17 +73,17 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
 
   //Send MP grid
   int mpgrid[3];
-  mpgrid[0]=1;
-  mpgrid[1]=1;
-  mpgrid[2]=1;
+  mpgrid[0]=2;
+  mpgrid[1]=2;
+  mpgrid[2]=2;
   MDI_Send_command(">MONKHORST-PACK_NPOINTS", mdi_comm);
   MDI_Send(mpgrid, 3, MDI_INT, mdi_comm);  
 
   //Send MP shift
   double mpshift[3];
-  mpshift[0]=0;
-  mpshift[1]=0;
-  mpshift[2]=0;
+  mpshift[0]=0.5;
+  mpshift[1]=0.5;
+  mpshift[2]=0.5;
   MDI_Send_command(">MONKHORST-PACK_SHIFT", mdi_comm);
   MDI_Send(mpshift, 3, MDI_DOUBLE, mdi_comm);  
 
