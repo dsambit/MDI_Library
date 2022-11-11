@@ -136,15 +136,19 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
   //compute energy
   double energy;
   MDI_Send_command("<ENERGY", mdi_comm);
-  MDI_Recv(&energy, 1, MDI_DOUBLE, mdi_comm);  
-  std::cout<<"DFT free energy: "<<std::setprecision(10)<<energy<<std::endl;
+  MDI_Recv(&energy, 1, MDI_DOUBLE, mdi_comm); 
+  if ( my_rank == 0 )
+    std::cout<<"DFT free energy: "<<std::setprecision(10)<<energy<<std::endl;
 
   //get forces
   double forces[3*natoms];
   MDI_Send_command("<FORCES", mdi_comm);
   MDI_Recv(forces, 3*natoms, MDI_DOUBLE, mdi_comm); 
-  for (int i=0; i<natoms; i++)
-     std::cout<<"Force, Atomid: "<<i<<", x: "<<forces[3*i+0]<<", y: "<<forces[3*i+1]<<", z: "<<forces[3*i+2]<<std::endl;
+  if ( my_rank == 0 )
+  {
+     for (int i=0; i<natoms; i++)
+         std::cout<<"Force, Atomid: "<<i<<", x: "<<forces[3*i+0]<<", y: "<<forces[3*i+1]<<", z: "<<forces[3*i+2]<<std::endl;
+  }
 
   //update coordinates
   coords[0]=0.1;
@@ -156,7 +160,8 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
   //compute energy
   MDI_Send_command("<ENERGY", mdi_comm);
   MDI_Recv(&energy, 1, MDI_DOUBLE, mdi_comm);  
-  std::cout<<"DFT free energy after COORDS update: "<<std::setprecision(10)<<energy<<std::endl;
+  if ( my_rank == 0 )
+    std::cout<<"DFT free energy after COORDS update: "<<std::setprecision(10)<<energy<<std::endl;
 
   //update cell
   cell[0]=10.0;cell[1]=0.1;cell[2]=0.0;
@@ -167,8 +172,9 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
 
   //compute energy
   MDI_Send_command("<ENERGY", mdi_comm);
-  MDI_Recv(&energy, 1, MDI_DOUBLE, mdi_comm);  
-  std::cout<<"DFT free energy after CELL update: "<<std::setprecision(10)<<energy<<std::endl;
+  MDI_Recv(&energy, 1, MDI_DOUBLE, mdi_comm); 
+  if ( my_rank == 0 )
+    std::cout<<"DFT free energy after CELL update: "<<std::setprecision(10)<<energy<<std::endl;
 
   if ( my_rank == 0 ) {
     std::cout << " Engine name: " << engine_name << std::endl;
