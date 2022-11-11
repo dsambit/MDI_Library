@@ -33,7 +33,25 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
   MDI_Send(&natoms, 1, MDI_INT, mdi_comm);
 
   //Send elements
-  int elements[natoms]={13,28,13,28,13,28,13,28,13,28,13,28,13,28,13,28};
+  int elements[natoms];
+  elements[0]=13;
+  elements[1]=28;
+  elements[2]=13;
+  elements[3]=28;
+  elements[4]=13;
+  elements[5]=28;
+  elements[6]=13;
+  elements[7]=28;
+  elements[8]=13;
+  elements[9]=28;
+  elements[10]=13;
+  elements[11]=28;
+  elements[12]=13;
+  elements[13]=28;
+  elements[14]=13;
+  elements[15]=28;
+
+
   MDI_Send_command(">ELEMENTS", mdi_comm);
   MDI_Send(&elements, natoms, MDI_INT, mdi_comm);
 
@@ -79,32 +97,34 @@ int code_for_plugin_instance(void* mpi_comm_ptr, MDI_Comm mdi_comm, void* class_
   //
 
   //initialize with fractional and then convert to cartesian
-  double coordsfrac[3*natoms]={0.000000000000,0.000000000000,0.000000000000,
-                                      0.250000000000,0.250000000000,0.250000000000,
-                                      0.000000000000,0.000000000000,0.500000000000,
-                                      0.250000000000,0.250000000000,0.750000000000,
-				                              0.000000000000,0.500000000000,0.000000000000,
-                                      0.250000000000,0.750000000000,0.250000000000,
-                                      0.000000000000,0.500000000000,0.500000000000,
-                                      0.250000000000,0.750000000000,0.750000000000,
-                                      0.500000000000,0.000000000000,0.000000000000,
-                                      0.750000000000,0.250000000000,0.250000000000,
-                                      0.500000000000,0.000000000000,0.500000000000,
-                                      0.750000000000,0.250000000000,0.750000000000,
-                                      0.500000000000,0.500000000000,0.000000000000,
-                                      0.750000000000,0.750000000000,0.250000000000,
-                                      0.500000000000,0.500000000000,0.500000000000,
-                                      0.750000000000,0.750000000000,0.750000000000};
+  double coordsfrac[3*natoms];
+  
+  coordsfrac[0]=0.000000000000;coordsfrac[1]=0.000000000000;coordsfrac[2]=0.000000000000;
+  coordsfrac[3]=0.250000000000;coordsfrac[4]=0.250000000000;coordsfrac[5]=0.250000000000;                                      
+  coordsfrac[6]=0.000000000000;coordsfrac[7]=0.000000000000;coordsfrac[8]=0.50000000000;
+  coordsfrac[9]=0.250000000000;coordsfrac[10]=0.250000000000;coordsfrac[11]=0.750000000000;  
+  coordsfrac[12]=0.000000000000;coordsfrac[13]=0.500000000000;coordsfrac[14]=0.000000000000;
+  coordsfrac[15]=0.250000000000;coordsfrac[16]=0.75000000000;coordsfrac[17]=0.250000000000;
+  coordsfrac[18]=0.000000000000;coordsfrac[19]=0.500000000000;coordsfrac[20]=0.500000000000;
+  coordsfrac[21]=0.250000000000;coordsfrac[22]=0.750000000000;coordsfrac[23]=0.750000000000;
+  coordsfrac[24]=0.500000000000;coordsfrac[25]=0.000000000000;coordsfrac[26]=0.00000000000;
+  coordsfrac[27]=0.750000000000;coordsfrac[28]=0.250000000000;coordsfrac[29]=0.2500000000000;
+  coordsfrac[30]=0.500000000000;coordsfrac[31]=0.000000000000;coordsfrac[32]=0.50000000000;
+  coordsfrac[33]=0.750000000000;coordsfrac[34]=0.250000000000;coordsfrac[35]=0.750000000000;
+  coordsfrac[36]=0.500000000000;coordsfrac[37]=0.500000000000;coordsfrac[38]=0.00000000000;
+  coordsfrac[39]=0.750000000000;coordsfrac[40]=0.750000000000;coordsfrac[41]=0.250000000000;
+  coordsfrac[42]=0.500000000000;coordsfrac[43]=0.500000000000;coordsfrac[44]=0.500000000000;
+  coordsfrac[45]=0.750000000000;coordsfrac[46]=0.750000000000;coordsfrac[47]=0.75000000000;
 
-  double coords[3*natoms]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};                                      
+  double coords[3*natoms];
 
   for (unsigned int i=0;i<natoms;++i)
-    for (unsigned int j=0;j<3;++j)      
+    for (unsigned int j=0;j<3;++j)  
+    {
+       coords[3*i+j]=0.0;    
        for (unsigned int l=0;l<3;++l)
           coords[3*i+j]+=cell[3*l+j]*coordsfrac[3*i+l];
-
+    }
   //for (int i=0; i<natoms; i++)
   //   std::cout<<"coords: "<<i<<", x: "<<coords[3*i+0]<<", y: "<<coords[3*i+1]<<", z: "<<coords[3*i+2]<<std::endl;
 
